@@ -31,13 +31,20 @@ def post_tweet(title, slug):
         access_token=settings.TWEETPONY_ACCESS_TOKEN,
         access_token_secret=settings.TWEETPONY_ACCESS_TOKEN_SECRET
     )
+    
+    if len(settings.NEWS_CC) > 1:    
+        cc = 'cc: %s' % (settings.NEWS_CC)
+    else:
+        cc = ''
+        
+    total_max_length = settings.NEWS_TITLE_MAX_LENGTH - len(cc)
 
-    if len(title) >= settings.NEWS_TITLE_MAX_LENGTH:
-        tweet_title = '%s...' % (title[:settings.NEWS_TITLE_MAX_LENGTH])
+    if len(title) >= total_max_length:
+        tweet_title = '%s...' % (title[:total_max_length])
     else:
         tweet_title = title
 
-    tweet = '%s: %s' % (tweet_title, short_link)
+    tweet = '%s: %s %s' % (tweet_title, short_link, cc)
 
     try:
         tweetpony_api.update_status(status=tweet)
